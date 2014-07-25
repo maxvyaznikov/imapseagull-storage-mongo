@@ -1,0 +1,19 @@
+{
+  "name": "imapseagull",
+  "version": "1.0.0",
+  "description": "Mongo decorator fot IMAP server (imapseagull)",
+  "main": "index.js",
+  "repository": "git@github.com:maxvyaznikov/imapseagull-storage-mongo.git",
+  "keywords": [
+    "Mongo"
+  ],
+  "dependencies": {
+    "mailcomposer": "~0.2.8",
+    "mailparser": "~0.4.4",
+    "xtend": ">=2.2.0",
+    "mongojs": ">=0.11.0",
+    "bcrypt-nodejs": ">=0.0.3"
+  },
+  "author": "Max Vyaznikov",
+  "license": "MIT"
+}
