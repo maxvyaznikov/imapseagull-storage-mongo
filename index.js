@@ -144,7 +144,6 @@ MongoDecorator.prototype.msgs_find = function(user, folder, flags, limit, callba
  * @param callback
  */
 MongoDecorator.prototype.msg_insert = function(message, callback) {
-    console.log('Inserting new message: %s -> %s', JSON.stringify(message.from), JSON.stringify(message.to));
     if (message && message._id) {
         delete message._id;
     }
@@ -152,7 +151,6 @@ MongoDecorator.prototype.msg_insert = function(message, callback) {
 };
 
 MongoDecorator.prototype.msg_update = function(message, callback) {
-    console.log('Updating message: %s -> %s', JSON.stringify(message.from), JSON.stringify(message.to));
     if (this.debug && !message._id) {
         console.trace("Variable 'message._id' is not set");
     }

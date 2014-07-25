@@ -12,6 +12,7 @@
     "mailparser": "~0.4.4",
     "xtend": ">=2.2.0",
     "mongojs": ">=0.11.0",
+    "node-uuid": ">=1.4.1",
     "bcrypt-nodejs": ">=0.0.3"
   },
   "author": "Max Vyaznikov",
