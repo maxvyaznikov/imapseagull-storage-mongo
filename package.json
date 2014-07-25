@@ -1,5 +1,5 @@
 {
-  "name": "imapseagull",
+  "name": "imapseagull-storage-mongo",
   "version": "1.0.0",
   "description": "Mongo decorator fot IMAP server (imapseagull)",
   "main": "index.js",
