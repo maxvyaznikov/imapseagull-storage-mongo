@@ -9,21 +9,22 @@ var MailComposer = require('mailcomposer').MailComposer;
 var MailParser = require('mailparser').MailParser;
 
 
-function MongoDecorator(cfg, callback) {
+function MongoDecorator(cfg) {
     this._cfg = cfg;
     this.debug = cfg.debug;
     this.attachments_path = cfg.attachments_path;
     this.server_name = cfg.name;
 
-    callback(null, this);
     return this
 }
 
-MongoDecorator.prototype.init = function() {
+MongoDecorator.prototype.init = function(callback) {
     this._db = mongojs(this._cfg.connection, [this._cfg.messages, this._cfg.users]);
 
     this._messages = this._db[this._cfg.messages];
     this._users = this._db[this._cfg.users];
+
+    callback(null, this);
     return this
 };
 
