@@ -132,9 +132,9 @@ MongoDecorator.prototype.msgs_find = function(user, folder, flags, limit, callba
         query.flags = flags;
     }
     if (limit) {
-        this._messages.find(query).sort({uid: -1}).limit(limit, callback);
+        this._messages.find(query).sort({uid: 1}).limit(limit, callback);
     } else {
-        this._messages.find(query).sort({uid: -1}, callback);
+        this._messages.find(query).sort({uid: 1}, callback);
     }
 };
 
