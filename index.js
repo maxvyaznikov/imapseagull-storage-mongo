@@ -9,6 +9,15 @@ var MailComposer = require('mailcomposer').MailComposer;
 var MailParser = require('mailparser').MailParser;
 
 
+/**
+ * @param cfg may have:
+ *      @param cfg.debug (bool) flag for extra messages
+ *      @param cfg.attachments_path (string) path to directory to keep attachments, for example:
+ *          path.join(__dirname, './attachments')
+ *      @param cfg.server_name (string) for conversion: username <-> email
+ * @returns {MongoDecorator}
+ * @constructor
+ */
 function MongoDecorator(cfg) {
     this._cfg = cfg;
     this.debug = cfg.debug;
