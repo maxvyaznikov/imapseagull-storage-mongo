@@ -1,12 +1,31 @@
-
 var bcrypt = require('bcrypt-nodejs');
 var mongojs = require('mongojs');
 var uuid = require('node-uuid');
 var path = require('path');
 var fs = require('fs');
 var extend = require('xtend');
+var async = require('async');
+var emailify = require('emailify');
 var MailComposer = require('mailcomposer').MailComposer;
 var MailParser = require('mailparser').MailParser;
+
+
+/**
+ * @param mail (object) results of MongoDecorator.prototype.parse_raw_msg
+ * @param callback
+ */
+function make_html_safe(mail, callback) {
+    if (mail.html) {
+        emailify.parse(mail.html, function (err, content) {
+            if (err) throw err;
+
+            mail.html = content;
+            callback(err);
+        });
+    } else{
+        callback(null);
+    }
+}
 
 
 /**
@@ -15,6 +34,7 @@ var MailParser = require('mailparser').MailParser;
  *      @param cfg.attachments_path (string) path to directory to keep attachments, for example:
  *          path.join(__dirname, './attachments')
  *      @param cfg.server_name (string) for conversion: username <-> email
+ *      @param cfg.post_parse_handlers (array) functions to post processing mail message after parse
  * @returns {MongoDecorator}
  * @constructor
  */
@@ -23,6 +43,9 @@ function MongoDecorator(cfg) {
     this.debug = cfg.debug;
     this.attachments_path = cfg.attachments_path;
     this.server_name = cfg.name;
+
+    this.post_parse_handlers = (cfg.post_parse_handlers || []);
+    this.post_parse_handlers.push(make_html_safe);
 
     return this
 }
@@ -86,8 +109,11 @@ MongoDecorator.prototype.parse_raw_msg = function(callback) {
     }.bind(this)));
     mailparser.on('end', function(mail) {
         mail.attached_files = mailparser.attached_files;
-        callback(mail);
-    });
+
+        async.applyEach(this.post_parse_handlers, mail, function() {
+            callback(mail);
+        }.bind(this));
+    }.bind(this));
     return mailparser;
 };
 
