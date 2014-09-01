@@ -1,6 +1,6 @@
 {
   "name": "imapseagull-storage-mongo",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Mongo decorator fot IMAP server (imapseagull)",
   "main": "index.js",
   "repository": "git@github.com:maxvyaznikov/imapseagull-storage-mongo.git",
@@ -14,7 +14,7 @@
     "mongojs": ">=0.11.0",
     "node-uuid": ">=1.4.1",
     "bcrypt-nodejs": ">=0.0.3",
-    "emailify": "",
+    "html-emailify": ">=0.0.3",
     "async": ""
   },
   "author": "Max Vyaznikov",
