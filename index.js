@@ -5,7 +5,7 @@ var path = require('path');
 var fs = require('fs');
 var extend = require('xtend');
 var async = require('async');
-var emailify = require('emailify');
+var emailify = require('html-emailify');
 var MailComposer = require('mailcomposer').MailComposer;
 var MailParser = require('mailparser').MailParser;
 
@@ -16,7 +16,7 @@ var MailParser = require('mailparser').MailParser;
  */
 function make_html_safe(mail, callback) {
     if (mail.html) {
-        emailify.parse(mail.html, function (err, content) {
+        emailify.parse(mail.html, function(err, content) {
             if (err) throw err;
 
             mail.html = content;
