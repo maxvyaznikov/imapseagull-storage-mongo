@@ -109,6 +109,9 @@ MongoDecorator.prototype.parse_raw_msg = function(callback) {
     return mailparser;
 };
 
+/**
+ * Build raw message (one big string with headers and body) from object in DB
+ */
 var fields_to_exclude = ['content-type', 'content-transfer-encoding', 'subject', 'from', 'to'];
 MongoDecorator.prototype.build_raw_msg = function(message, callback) {
     if (message.raw) {
@@ -166,9 +169,20 @@ MongoDecorator.prototype.msgs_find = function(user, folder, flags, limit, callba
 };
 
 /**
+ * Insert message into DB. You can simple rewrite this function.
+ * But remember required fields in Message object:
+ *  * (String) [uid]
+ *  * (ObjectId) [user]
+ *  * (String) [folder]
+ *  * (Array of Strings) [flags]
+ *  * [date]
+ *  * [internaldate]
+ *  * (Array of Objects) [attached_files]
+ *  * [MODSEQ] for condstore plugin
+ *
  * TODO: increase uidnext into folder of IMAPServer somehow
  *
- * @param message should have structure described in comments  to IMAPServer.prototype.parse_raw_msg
+ * @param message should have structure described in comments to MongoDecorator.prototype.parse_raw_msg
  * @param callback
  */
 MongoDecorator.prototype.msg_insert = function(message, callback) {
