@@ -15,7 +15,8 @@
     "node-uuid": ">=1.4.1",
     "bcrypt-nodejs": ">=0.0.3",
     "sanitizer": "",
-    "async": ""
+    "async": "",
+    "tmp": ""
   },
   "author": "Max Vyaznikov",
   "license": "MIT"

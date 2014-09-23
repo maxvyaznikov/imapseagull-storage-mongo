@@ -3,6 +3,7 @@ var mongojs = require('mongojs');
 var uuid = require('node-uuid');
 var path = require('path');
 var fs = require('fs');
+var tmp = require('tmp');
 var extend = require('xtend');
 var async = require('async');
 var sanitizer = require('sanitizer');
@@ -87,24 +88,33 @@ MongoDecorator.prototype.parse_raw_msg = function(callback) {
         forceEmbeddedImages: true
     });
     mailparser.attached_files = [];
-    mailparser.on('attachment', (function(attachment){
-        var work_name = attachment.checksum +'-'+ process.hrtime()[0],
-            full_path = path.join(this.attachments_path, work_name),
-            output = fs.createWriteStream(full_path);
-        attachment.stream.pipe(output);
-        mailparser.attached_files.push({
-            filePath: work_name,
-            fileName: attachment.generatedFileName,
-            cid: attachment.contentId,
-            length: attachment.length,
-            contentType: attachment.contentType
-        });
+    mailparser.on('attachment', (function(attachment) {
+        tmp.tmpName(function(err, path) {
+            if (err) throw err;
+
+            attachment.filePath = path;
+            attachment.stream.pipe(fs.createWriteStream(path));
+            mailparser.attached_files.push(attachment);
+        }.bind(this));
     }.bind(this)));
     mailparser.on('end', function(mail) {
-        mail.attached_files = mailparser.attached_files;
+        async.map(mailparser.attached_files, function(attachment, next) {
+            var new_path = attachment.checksum +'-'+ process.hrtime()[0];
+            fs.rename(attachment.filePath, new_path, function(err) {
+                next(err, {
+                    filePath: new_path,
+                    fileName: attachment.generatedFileName,
+                    cid: attachment.contentId,
+                    length: attachment.length,
+                    contentType: attachment.contentType
+                })
+            })
+        }, function(err, attached_files) {
+            mail.attached_files = attached_files;
 
-        async.applyEach(this.post_parse_handlers, mail, function() {
-            callback(mail);
+            async.applyEach(this.post_parse_handlers, mail, function() {
+                callback(mail);
+            }.bind(this));
         }.bind(this));
     }.bind(this));
     return mailparser;
