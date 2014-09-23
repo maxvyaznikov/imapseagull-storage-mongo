@@ -100,7 +100,7 @@ MongoDecorator.prototype.parse_raw_msg = function(callback) {
     mailparser.on('end', function(mail) {
         async.map(mailparser.attached_files, function(attachment, next) {
             var new_path = attachment.checksum +'-'+ process.hrtime()[0];
-            fs.rename(attachment.filePath, new_path, function(err) {
+            fs.rename(attachment.filePath, path.join(this.attachments_path, new_path), function(err) {
                 next(err, {
                     filePath: new_path,
                     fileName: attachment.generatedFileName,
@@ -109,7 +109,7 @@ MongoDecorator.prototype.parse_raw_msg = function(callback) {
                     contentType: attachment.contentType
                 })
             })
-        }, function(err, attached_files) {
+        }.bind(this), function(err, attached_files) {
             mail.attached_files = attached_files;
 
             async.applyEach(this.post_parse_handlers, mail, function() {
