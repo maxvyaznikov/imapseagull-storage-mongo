@@ -88,11 +88,12 @@ MongoDecorator.prototype.parse_raw_msg = function(callback) {
     });
     mailparser.attached_files = [];
     mailparser.on('attachment', (function(attachment){
-        var full_path = path.join(this.attachments_path, attachment.generatedFileName),
+        var work_name = attachment.checksum +'-'+ process.hrtime()[0],
+            full_path = path.join(this.attachments_path, work_name),
             output = fs.createWriteStream(full_path);
         attachment.stream.pipe(output);
         mailparser.attached_files.push({
-            filePath: full_path,
+            filePath: work_name,
             fileName: attachment.generatedFileName,
             cid: attachment.contentId,
             length: attachment.length,
