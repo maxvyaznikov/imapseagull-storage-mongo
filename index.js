@@ -102,8 +102,9 @@ MongoDecorator.prototype.parse_raw_msg = function(callback) {
             var new_path = attachment.checksum +'-'+ process.hrtime()[0];
             fs.rename(attachment.filePath, path.join(this.attachments_path, new_path), function(err) {
                 next(err, {
-                    filePath: new_path,
-                    fileName: attachment.generatedFileName,
+                    path: new_path,
+                    name: attachment.generatedFileName,
+                    ext: attachment.generatedFileName.split(".").pop().toLowerCase(),
                     cid: attachment.contentId,
                     length: attachment.length,
                     contentType: attachment.contentType
