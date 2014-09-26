@@ -259,12 +259,10 @@ MongoDecorator.prototype.msgs_remove = function(user, folder, flags, callback) {
  * @param {function} [callback] will be called with arguments: {String} err, {Array} deleted_messages, {Number} count
  */
 MongoDecorator.prototype.user_get = function(username, callback) {
-    var query = {};
-    if (Object.prototype.toString.call(username) == '[object Array]') {
-        query.email = {$in: username}
-    } else {
-        query.email = username.indexOf('@') >= 0 ? username : username + '@' + this.server_name
-    }
+    var query = {
+        email: username.indexOf('@') >= 0 ? username : username + '@' + this.server_name,
+        'aliases.email': username
+    };
     this._users.find(query).limit(1, function(err, users) {
         callback(err, users && users.length && users[0] || null)
     });
