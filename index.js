@@ -11,12 +11,41 @@ var MailComposer = require('mailcomposer').MailComposer;
 var MailParser = require('mailparser').MailParser;
 
 
+var _tagPolicy = sanitizer.makeTagPolicy();
+function sanitizationTagPolicy(mail, tagName, attribs) {
+    if (tagName == 'img' && attribs.length) {
+        var src, i;
+        for (i = 0; i < attribs.length; i += 2) {
+            if (attribs[i] == 'src') {
+                src = attribs[i + 1];
+                break;
+            }
+        }
+
+        if (src) {
+            u = url.parse(src);
+            if (u) {
+                // TODO: download online-links and embed as attachments
+                var attrs = sanitizer.sanitizeAttribs(tagName, attribs);
+                attrs.push('src');
+                attrs.push(url.format(u));
+                return {
+                    attribs: attrs
+                }
+            }
+        }
+    }
+
+    return _tagPolicy.call(this, tagName, attribs);
+}
+
 /**
  * @param mail (object) results of MongoDecorator.prototype.parse_raw_msg
  * @param callback
  */
 function make_html_safe(mail, callback) {
-    mail.html = sanitizer.sanitize(mail.html || '');
+    sanitizer.sanitizeWithPolicy(mail.html || '', async.apply(sanitizationTagPolicy, mail));
+    mail.html = (mail.html || '');
     callback();
 }
 
