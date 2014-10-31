@@ -69,6 +69,7 @@ MongoDecorator.prototype.init = function(callback) {
  *                   contentType: 'image/png'
  */
 MongoDecorator.prototype.parse_raw_msg = function(callback) {
+    var me = this;
     var mailparser = new MailParser({
         defaultCharset: 'UTF-8',
         streamAttachments: true,
@@ -100,7 +101,7 @@ MongoDecorator.prototype.parse_raw_msg = function(callback) {
         }.bind(this), function(err, attached_files) {
             mail.attached_files = attached_files;
 
-            async.applyEach(this.post_parse_handlers, mail, function() {
+            async.applyEach(this.post_parse_handlers, me, mail, function() {
                 callback(mail);
             }.bind(this));
         }.bind(this));
