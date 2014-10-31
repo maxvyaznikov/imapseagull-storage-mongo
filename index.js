@@ -6,49 +6,8 @@ var fs = require('fs');
 var tmp = require('tmp');
 var extend = require('xtend');
 var async = require('async');
-var sanitizer = require('sanitizer');
 var MailComposer = require('mailcomposer').MailComposer;
 var MailParser = require('mailparser').MailParser;
-
-
-var _tagPolicy = sanitizer.makeTagPolicy(),
-    _hrefScript = ['javascript:', 'vbscript:'],
-    _tags = ['img', 'a'], _attrs = ['src', 'href'];
-function sanitizationTagPolicy(tagName, attribs) {
-    if (_tags.indexOf(tagName) >= 0 && attribs.length) {
-        var a, a_name, i;
-        for (i = 0; i < attribs.length; i += 2) {
-            if (_attrs.indexOf(attribs[i]) >= 0) {
-                a_name = attribs[i];
-                a = attribs[i + 1];
-                break;
-            }
-        }
-
-        if (a) {
-            u = url.parse(a);
-            if (u && _hrefScript.indexOf(u.protocol) < 0) {
-                // TODO: download online-links and embed as attachments
-                var attrs = sanitizer.sanitizeAttribs(tagName, attribs);
-                attrs.push(a_name);
-                attrs.push(url.format(u));
-                return { attribs: attrs }
-            }
-        }
-    }
-
-    return _tagPolicy.call(this, tagName, attribs);
-}
-
-/**
- * @param mail (object) results of MongoDecorator.prototype.parse_raw_msg
- * @param callback
- */
-function make_html_safe(mail, callback) {
-    sanitizer.sanitizeWithPolicy(mail.html || '', sanitizationTagPolicy);
-    mail.html = (mail.html || '');
-    callback();
-}
 
 
 /**
@@ -68,8 +27,6 @@ function MongoDecorator(cfg) {
     this.server_name = cfg.name;
 
     this.post_parse_handlers = (cfg.post_parse_handlers || []);
-    this.post_parse_handlers.push(make_html_safe);
-
     return this
 }
 
