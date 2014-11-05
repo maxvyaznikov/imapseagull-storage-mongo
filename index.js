@@ -77,26 +77,20 @@ MongoDecorator.prototype.parse_raw_msg = function(callback) {
     });
     mailparser.attached_files = [];
     mailparser.on('attachment', (function(attachment) {
-        tmp.tmpName(function(err, path) {
-            if (err) throw err;
-
-            attachment.filePath = path;
-            attachment.stream.pipe(fs.createWriteStream(path));
-            mailparser.attached_files.push(attachment);
-        }.bind(this));
+        var path = path.join(this.attachments_path, uuid.v4());
+        attachment.filePath = path;
+        attachment.stream.pipe(fs.createWriteStream(path));
+        mailparser.attached_files.push(attachment);
     }.bind(this)));
     mailparser.on('end', function(mail) {
         async.map(mailparser.attached_files, function(attachment, next) {
-            var new_path = attachment.checksum +'-'+ process.hrtime()[0];
-            fs.rename(attachment.filePath, path.join(this.attachments_path, new_path), function(err) {
-                next(err, {
-                    path: new_path,
-                    name: attachment.generatedFileName,
-                    ext: attachment.generatedFileName.split(".").pop().toLowerCase(),
-                    cid: attachment.contentId,
-                    length: attachment.length,
-                    contentType: attachment.contentType
-                })
+            next(null, {
+                path: attachment.filePath,
+                name: attachment.generatedFileName,
+                ext: attachment.generatedFileName.split(".").pop().toLowerCase(),
+                cid: attachment.contentId,
+                length: attachment.length,
+                contentType: attachment.contentType
             })
         }.bind(this), function(err, attached_files) {
             mail.attached_files = attached_files;
