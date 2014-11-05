@@ -77,9 +77,8 @@ MongoDecorator.prototype.parse_raw_msg = function(callback) {
     });
     mailparser.attached_files = [];
     mailparser.on('attachment', (function(attachment) {
-        var p = path.join(this.attachments_path, uuid.v4());
-        attachment.filePath = p;
-        attachment.stream.pipe(fs.createWriteStream(p));
+        attachment.filePath = uuid.v4();
+        attachment.stream.pipe(fs.createWriteStream(path.join(this.attachments_path, attachment.filePath)));
         mailparser.attached_files.push(attachment);
     }.bind(this)));
     mailparser.on('end', function(mail) {
